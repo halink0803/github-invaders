@@ -4,6 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Git Invaders — Destroy 365 Days</title>
+<meta property="og:title" content="Git Invaders — Destroy 365 Days">
+<meta property="og:description" content="A Space Invaders game where you destroy 365 days of GitHub contributions. Can you clear the full year?">
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Git Invaders">
+<meta name="twitter:description" content="Can you clear all 365 days of contributions? Challenge accepted.">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&family=Press+Start+2P&display=swap');
 
@@ -216,6 +222,281 @@
     margin-bottom: 10px;
   }
 
+  /* ===== SHARE / CHALLENGE ===== */
+  .share-btn {
+    pointer-events: all;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 10px;
+    padding: 10px 24px;
+    background: rgba(88,166,255,0.08);
+    color: #58a6ff;
+    border: 1px solid rgba(88,166,255,0.25);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 1px;
+    margin-top: 12px;
+  }
+
+  .share-btn:hover {
+    background: rgba(88,166,255,0.18);
+    border-color: #58a6ff;
+    box-shadow: 0 0 16px rgba(88,166,255,0.2);
+  }
+
+  /* Share Modal */
+  #share-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 300;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.8);
+    backdrop-filter: blur(10px);
+    cursor: default;
+    padding: 16px;
+  }
+
+  #share-modal.open { display: flex; }
+
+  .share-modal-box {
+    background: #0d1117;
+    border: 1px solid #30363d;
+    border-radius: 12px;
+    padding: 28px 24px 24px;
+    width: 100%;
+    max-width: 380px;
+    position: relative;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.6);
+  }
+
+  .share-modal-title {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 11px;
+    color: #c9d1d9;
+    margin-bottom: 20px;
+    text-align: center;
+    letter-spacing: 1px;
+  }
+
+  .share-modal-close {
+    position: absolute;
+    top: 12px; right: 14px;
+    background: none;
+    border: none;
+    color: #484f58;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    pointer-events: all;
+    transition: color 0.15s;
+  }
+  .share-modal-close:hover { color: #c9d1d9; }
+
+  /* Link preview card */
+  .link-preview {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+
+  .lp-bar {
+    background: #0d1117;
+    border-bottom: 1px solid #21262d;
+    padding: 7px 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .lp-bar-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #30363d;
+    flex-shrink: 0;
+  }
+
+  .lp-bar-url {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: #484f58;
+    letter-spacing: 0.5px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .lp-body {
+    padding: 20px 20px 16px;
+    text-align: center;
+  }
+
+  .lp-game-name {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 8px;
+    color: #39d353;
+    letter-spacing: 3px;
+    opacity: 0.7;
+    margin-bottom: 12px;
+  }
+
+  .lp-score {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 36px;
+    line-height: 1;
+    color: #e3b341;
+    text-shadow: 0 0 28px rgba(227,179,65,0.5);
+    margin-bottom: 4px;
+  }
+
+  .lp-pts {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 8px;
+    color: #484f58;
+    letter-spacing: 2px;
+    margin-bottom: 14px;
+  }
+
+  .lp-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: #58a6ff;
+    margin-bottom: 10px;
+    letter-spacing: 0.3px;
+  }
+
+  .lp-cta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9px;
+    color: #484f58;
+    letter-spacing: 1px;
+  }
+
+  /* Social buttons */
+  .share-options {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .social-btn {
+    pointer-events: all;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 8px;
+    padding: 13px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.18s;
+    border: 1px solid transparent;
+    letter-spacing: 0.5px;
+    width: 100%;
+  }
+
+  .social-btn svg { flex-shrink: 0; }
+
+  .social-btn-facebook {
+    background: #1877f2;
+    color: #fff;
+    border-color: #1877f2;
+  }
+  .social-btn-facebook:hover {
+    background: #1466d6;
+    box-shadow: 0 0 18px rgba(24,119,242,0.35);
+  }
+
+  .social-btn-x {
+    background: #000;
+    color: #fff;
+    border-color: #333;
+  }
+  .social-btn-x:hover {
+    background: #111;
+    border-color: #555;
+    box-shadow: 0 0 18px rgba(255,255,255,0.08);
+  }
+
+  .social-btn-copy {
+    background: transparent;
+    color: #484f58;
+    border-color: #30363d;
+  }
+  .social-btn-copy:hover {
+    color: #c9d1d9;
+    border-color: #484f58;
+    background: #161b22;
+  }
+  .social-btn-copy.copied {
+    color: #39d353;
+    border-color: rgba(57,211,83,0.4);
+    background: rgba(57,211,83,0.05);
+  }
+
+  #challenge-card {
+    display: none;
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    padding: 14px 28px;
+    text-align: center;
+    margin-bottom: 20px;
+    width: 100%;
+    max-width: 340px;
+  }
+
+  .challenge-label {
+    font-size: 8px;
+    color: #484f58;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .challenge-score {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 28px;
+    color: #e3b341;
+    text-shadow: 0 0 20px rgba(227,179,65,0.4);
+    margin: 6px 0;
+  }
+
+  .challenge-meta {
+    font-size: 10px;
+    color: #484f58;
+    margin-top: 6px;
+    letter-spacing: 1px;
+  }
+
+  #toast {
+    position: fixed;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%) translateY(16px);
+    background: #21262d;
+    border: 1px solid #30363d;
+    border-radius: 6px;
+    padding: 10px 20px;
+    font-size: 11px;
+    color: #c9d1d9;
+    z-index: 200;
+    opacity: 0;
+    transition: opacity 0.25s, transform 0.25s;
+    pointer-events: none;
+    font-family: 'JetBrains Mono', monospace;
+    white-space: nowrap;
+  }
+
+  #toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
   /* ===== DASHBOARD ===== */
   #dashboard-screen {
     position: fixed;
@@ -390,8 +671,13 @@
     <span class="badge warning-badge">AUTO-FIRE</span>
     <span class="badge info-badge">52 WEEKS × 7 DAYS</span>
   </div>
+  <div id="challenge-card">
+    <div class="challenge-label">Can you beat this?</div>
+    <div class="challenge-score" id="challenge-score-val">0</div>
+    <div class="challenge-meta" id="challenge-meta-val"></div>
+  </div>
   <button class="start-btn" id="start-btn">START GAME</button>
-  <button class="secondary-btn" id="stats-btn-start">VIEW STATS</button>
+  <button class="secondary-btn" id="stats-btn-start">VIEW RESULTS</button>
   <div class="controls-info">
     <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> or <kbd>↑</kbd><kbd>←</kbd><kbd>↓</kbd><kbd>→</kbd> to move freely<br>
     Mouse controls ship position &nbsp; <kbd>P</kbd> Pause<br>
@@ -420,8 +706,47 @@
     </div>
   </div>
   <button class="start-btn" id="restart-btn">PLAY AGAIN</button>
-  <button class="secondary-btn" id="stats-btn-gameover">VIEW STATS</button>
+  <button class="share-btn" id="share-btn">SHARE RESULT</button>
+  <button class="secondary-btn" id="stats-btn-gameover">VIEW RESULTS</button>
 </div>
+
+<div id="share-modal">
+  <div class="share-modal-box">
+    <button class="share-modal-close" id="share-modal-close">×</button>
+    <div class="share-modal-title">SHARE RESULT</div>
+
+    <div class="link-preview">
+      <div class="lp-bar">
+        <span class="lp-bar-dot"></span>
+        <span class="lp-bar-url" id="lp-url"></span>
+      </div>
+      <div class="lp-body">
+        <div class="lp-game-name">GIT INVADERS</div>
+        <div class="lp-score" id="lp-score">0</div>
+        <div class="lp-pts">PTS</div>
+        <div class="lp-meta" id="lp-meta"></div>
+        <div class="lp-cta">Can you beat me?</div>
+      </div>
+    </div>
+
+    <div class="share-options">
+      <button class="social-btn social-btn-facebook" id="share-facebook">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+        SHARE ON FACEBOOK
+      </button>
+      <button class="social-btn social-btn-x" id="share-x">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+        SHARE ON X
+      </button>
+      <button class="social-btn social-btn-copy" id="share-copy">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+        <span id="copy-btn-label">COPY LINK</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
 
 <div id="dashboard-screen">
   <div class="dash-title">STATS</div>
@@ -494,6 +819,7 @@ let pausedTimeAccum = 0;
 let pauseStart = 0;
 let totalEnemies = 0;
 let destroyedCount = 0;
+let lastGameIsWin = false;
 
 const player = { x: 0, y: 0, speed: 5, shootCooldown: 0, alive: true };
 
@@ -1110,6 +1436,7 @@ function win() {
 
 function showGameOver(isWin) {
   gameState = 'gameover';
+  lastGameIsWin = isWin;
   const pct = Math.round(destroyedCount / totalEnemies * 100);
 
   saveGame({
@@ -1180,6 +1507,96 @@ function renderDashboard() {
     </tr></thead>
     <tbody>${rows}</tbody>
   </table>`;
+}
+
+// ===== SHARE =====
+
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg;
+  toast.classList.add('show');
+  clearTimeout(toast._timer);
+  toast._timer = setTimeout(() => toast.classList.remove('show'), 2500);
+}
+
+let _shareUrl = '';
+let _shareText = '';
+
+function shareResult() {
+  const pct = Math.round(destroyedCount / totalEnemies * 100);
+  const params = new URLSearchParams({
+    s: score,
+    t: Math.round(elapsedTime),
+    d: destroyedCount,
+    n: totalEnemies,
+    w: lastGameIsWin ? 1 : 0
+  });
+  _shareUrl = location.href.split('#')[0] + '#' + params;
+  _shareText = `🎮 Git Invaders — ${score.toLocaleString()} pts · ${pct}% cleared in ${formatTime(elapsedTime)}\nCan you beat me?`;
+
+  // Populate preview card
+  document.getElementById('lp-score').textContent = score.toLocaleString();
+  document.getElementById('lp-meta').textContent =
+    `${pct}% cleared · ${formatTime(elapsedTime)}`;
+  document.getElementById('lp-url').textContent =
+    _shareUrl.replace(/^https?:\/\//, '').substring(0, 48);
+
+  // Reset copy button
+  const copyBtn = document.getElementById('share-copy');
+  copyBtn.classList.remove('copied');
+  document.getElementById('copy-btn-label').textContent = 'COPY LINK';
+
+  document.getElementById('share-modal').classList.add('open');
+}
+
+function closeShareModal() {
+  document.getElementById('share-modal').classList.remove('open');
+}
+
+function openFacebookShare() {
+  // Facebook's sharer doesn't accept pre-filled text — copy it to clipboard first
+  navigator.clipboard.writeText(_shareText + '\n' + _shareUrl).catch(() => {});
+  showToast('Post text copied — paste it in Facebook!');
+  window.open(
+    'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(_shareUrl),
+    '_blank', 'width=600,height=500,noopener'
+  );
+}
+
+function openXShare() {
+  const tweetUrl = 'https://twitter.com/intent/tweet?text=' +
+    encodeURIComponent(_shareText + '\n') + '&url=' + encodeURIComponent(_shareUrl);
+  window.open(tweetUrl, '_blank', 'width=600,height=400,noopener');
+}
+
+function copyShareLink() {
+  navigator.clipboard.writeText(_shareUrl).then(() => {
+    const btn = document.getElementById('share-copy');
+    btn.classList.add('copied');
+    document.getElementById('copy-btn-label').textContent = 'COPIED!';
+    setTimeout(() => {
+      btn.classList.remove('copied');
+      document.getElementById('copy-btn-label').textContent = 'COPY LINK';
+    }, 2500);
+  }).catch(() => showToast('Copy failed — try manually'));
+}
+
+function checkSharedResult() {
+  if (!location.hash || location.hash.length < 2) return;
+  try {
+    const params = new URLSearchParams(location.hash.slice(1));
+    const s = parseInt(params.get('s'));
+    const t = parseInt(params.get('t'));
+    const d = parseInt(params.get('d'));
+    const n = parseInt(params.get('n'));
+    const w = params.get('w') === '1';
+    if (isNaN(s) || isNaN(t) || isNaN(d) || isNaN(n)) return;
+    const pct = n > 0 ? Math.round(d / n * 100) : 0;
+    document.getElementById('challenge-score-val').textContent = s.toLocaleString();
+    document.getElementById('challenge-meta-val').textContent =
+      `${pct}% cleared · ${formatTime(t)}`;
+    document.getElementById('challenge-card').style.display = 'block';
+  } catch (e) {}
 }
 
 function showDashboard() {
@@ -1328,7 +1745,16 @@ document.getElementById('restart-btn').addEventListener('click', startGame);
 document.getElementById('stats-btn-start').addEventListener('click', showDashboard);
 document.getElementById('stats-btn-gameover').addEventListener('click', showDashboard);
 document.getElementById('dash-back-btn').addEventListener('click', hideDashboard);
+document.getElementById('share-btn').addEventListener('click', shareResult);
+document.getElementById('share-modal-close').addEventListener('click', closeShareModal);
+document.getElementById('share-modal').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeShareModal();
+});
+document.getElementById('share-facebook').addEventListener('click', openFacebookShare);
+document.getElementById('share-x').addEventListener('click', openXShare);
+document.getElementById('share-copy').addEventListener('click', copyShareLink);
 
+checkSharedResult();
 render();
 gameLoop();
 </script>
