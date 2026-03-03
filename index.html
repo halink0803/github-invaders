@@ -677,7 +677,7 @@
     <div class="challenge-meta" id="challenge-meta-val"></div>
   </div>
   <button class="start-btn" id="start-btn">START GAME</button>
-  <button class="secondary-btn" id="stats-btn-start">VIEW STATS</button>
+  <button class="secondary-btn" id="stats-btn-start">VIEW RESULTS</button>
   <div class="controls-info">
     <kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd> or <kbd>↑</kbd><kbd>←</kbd><kbd>↓</kbd><kbd>→</kbd> to move freely<br>
     Mouse controls ship position &nbsp; <kbd>P</kbd> Pause<br>
@@ -707,7 +707,7 @@
   </div>
   <button class="start-btn" id="restart-btn">PLAY AGAIN</button>
   <button class="share-btn" id="share-btn">SHARE RESULT</button>
-  <button class="secondary-btn" id="stats-btn-gameover">VIEW STATS</button>
+  <button class="secondary-btn" id="stats-btn-gameover">VIEW RESULTS</button>
 </div>
 
 <div id="share-modal">
@@ -1532,13 +1532,12 @@ function shareResult() {
     w: lastGameIsWin ? 1 : 0
   });
   _shareUrl = location.href.split('#')[0] + '#' + params;
-  const outcome = lastGameIsWin ? '🏆 CLEARED' : '💀 GAME OVER';
-  _shareText = `${outcome} — Git Invaders\n${score.toLocaleString()} pts · ${pct}% cleared in ${formatTime(elapsedTime)}\nCan you beat me?`;
+  _shareText = `🎮 Git Invaders — ${score.toLocaleString()} pts · ${pct}% cleared in ${formatTime(elapsedTime)}\nCan you beat me?`;
 
   // Populate preview card
   document.getElementById('lp-score').textContent = score.toLocaleString();
   document.getElementById('lp-meta').textContent =
-    `${lastGameIsWin ? '🏆 WIN' : '💀 LOSE'} · ${formatTime(elapsedTime)} · ${pct}% cleared`;
+    `${pct}% cleared · ${formatTime(elapsedTime)}`;
   document.getElementById('lp-url').textContent =
     _shareUrl.replace(/^https?:\/\//, '').substring(0, 48);
 
@@ -1555,15 +1554,18 @@ function closeShareModal() {
 }
 
 function openFacebookShare() {
+  // Facebook's sharer doesn't accept pre-filled text — copy it to clipboard first
+  navigator.clipboard.writeText(_shareText + '\n' + _shareUrl).catch(() => {});
+  showToast('Post text copied — paste it in Facebook!');
   window.open(
     'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(_shareUrl),
-    '_blank', 'width=600,height=400,noopener'
+    '_blank', 'width=600,height=500,noopener'
   );
 }
 
 function openXShare() {
   const tweetUrl = 'https://twitter.com/intent/tweet?text=' +
-    encodeURIComponent(_shareText) + '&url=' + encodeURIComponent(_shareUrl);
+    encodeURIComponent(_shareText + '\n') + '&url=' + encodeURIComponent(_shareUrl);
   window.open(tweetUrl, '_blank', 'width=600,height=400,noopener');
 }
 
@@ -1592,7 +1594,7 @@ function checkSharedResult() {
     const pct = n > 0 ? Math.round(d / n * 100) : 0;
     document.getElementById('challenge-score-val').textContent = s.toLocaleString();
     document.getElementById('challenge-meta-val').textContent =
-      `${w ? '🏆 WIN' : '💀 LOSE'} · ${formatTime(t)} · ${pct}% cleared`;
+      `${pct}% cleared · ${formatTime(t)}`;
     document.getElementById('challenge-card').style.display = 'block';
   } catch (e) {}
 }
